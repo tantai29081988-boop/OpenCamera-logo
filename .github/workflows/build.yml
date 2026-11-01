@@ -1,0 +1,27 @@
+name: Build Tai An Chay Camera
+on:
+  push:
+    branches: [ master, main ]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '8'
+      - uses: android-actions/setup-android@v3
+      - run: sdkmanager --install "ndk;21.4.7075529"
+      - run: sudo apt-get update && sudo apt-get install -y ant
+      - run: |
+          mkdir -p assets
+          ls -lh assets/
+      - run: |
+          android update project --path . --target android-30 || true
+          ant debug || ant release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TaiAnChay-Camera-APK
+          path: bin/*.apk
